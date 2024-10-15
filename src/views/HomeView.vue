@@ -1,44 +1,39 @@
 <script setup lang="ts">
-import GraphD3 from '@/components/GraphD3.vue';
+import GraphD3 from '@/components/GraphD3.vue'
 
 // TODO: This can be imported or fetched
 //       The mapper can be removed then. This application should have no
 //       knowledge of GoodWe. It should just be able to receive data in a certain format.
-import goodweResponse from '@/assets/example-responses/goodwe-get-statistics-charts-year.json';
-import { mapGoodWeResponseToD3Chart } from '@/mappers/goodwe-response-to-d3-chart';
+import goodweYearResponse from '@/assets/example-responses/goodwe-get-statistics-charts-year.json';
+import goodweMonthResponse from '@/assets/example-responses/goodwe-get-statistics-charts-month.json';
+import { mapGoodWeChartResponseToD3Chart } from '@/mappers/goodwe-response-to-d3-chart';
+import { TimeFormat } from '@/models/D3/time-format.enum'
 
-const mappedResponse = mapGoodWeResponseToD3Chart(goodweResponse);
+const mappedYearResponse = mapGoodWeChartResponseToD3Chart(goodweYearResponse);
+// TODO: map the month response to the weeks in that month
+const mappedMonthResponse = mapGoodWeChartResponseToD3Chart(goodweMonthResponse);
 </script>
 
 <template>
   <main>
-    <div class="container">
-      <div class="max-width">
-        <div class="header">
-          <h1 class="page-title">2024</h1>
-        </div>
-      </div>
-    </div>
-    <GraphD3 v-if="mappedResponse && mappedResponse.length > 0" :data="mappedResponse" title="GoodWe omvormer" />
+    <GraphD3
+      v-if="mappedYearResponse && mappedYearResponse.length > 0"
+      :data="mappedYearResponse"
+      deviceName="GoodWe omvormer"
+      title="2024"
+      :scalingStep="200"
+      :timeFormatSpecifier="TimeFormat.YEAR"
+    />
+    <GraphD3
+      v-if="mappedMonthResponse && mappedMonthResponse.length > 0"
+      :data="mappedMonthResponse"
+      deviceName="GoodWe omvormer"
+      title="October"
+      :scalingStep="10"
+      :timeFormatSpecifier="TimeFormat.MONTH"
+    />
   </main>
 </template>
 
 <style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-}
-.max-width {
-  width: 640px;
-  max-width: 1024px;
-}
-.header {
-  width: 100%;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
-.page-title {
-  font-size: 1.8rem;
-  font-weight: bold;
-}
 </style>

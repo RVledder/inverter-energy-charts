@@ -4,32 +4,47 @@ import * as d3 from 'd3'
 import type { BackDeliveryChartData } from '@/models/D3/back-delivery-chart-data'
 import IconUpwardArrow from '@/components/icons/IconUpwardArrow.vue'
 import IconSun from '@/components/icons/IconSun.vue'
+import { TimeFormat } from '@/models/D3/time-format.enum'
 
 const props = defineProps<{
-  title: string
-  data: BackDeliveryChartData
+  title: string;
+  deviceName: string;
+  data: BackDeliveryChartData;
+  scalingStep: number;
+  timeFormatSpecifier: TimeFormat;
 }>()
 
-const svgRef = ref<HTMLDivElement | null>(null);
-const productionTotal = ref<number | null>(0);
+const svgRef = ref<HTMLDivElement | null>(null)
+const productionTotal = ref<number | null>(0)
 
-productionTotal.value = Math.ceil(props.data.reduce((acc, d) => acc + d.value, 0));
+productionTotal.value = Math.ceil(
+  props.data.reduce((acc, d) => acc + d.value, 0),
+)
 
-const width = 640
-const height = 250
-const marginTop = 20
-const marginRight = 50
-const marginBottom = 30
-const marginLeft = 0
+const width = 640;
+const height = 250;
+const marginTop = 20;
+const marginRight = 50;
+const marginBottom = 30;
+const marginLeft = 0;
 
-const allMonths = d3.range(0, 12).map(m => new Date(2023, m, 1))
-const yMax = Math.ceil(d3.max(props.data, d => d.value)! / 200) * 200
+const year = props.data[0].date.getFullYear();
+const amountOfTicks = props.data.reduce((acc) => acc + 1, 0); // TODO  + 1
+
+const dateRangeMap = {
+  [TimeFormat.MONTH]: d3.range(1, amountOfTicks).map(d => new Date(year, 9, d)),
+  [TimeFormat.YEAR]: d3.range(0, amountOfTicks).map(m => new Date(year, m, 1)),
+}
+
+const dateRange = dateRangeMap[props.timeFormatSpecifier];
+
+const yMax = Math.ceil(d3.max(props.data, d => d.value)! / props.scalingStep) * props.scalingStep;
 
 const x = d3
   .scaleBand()
-  .domain(allMonths.map(d => d3.timeFormat('%b')(d)))
+  .domain(dateRange.map(d => d3.timeFormat(props.timeFormatSpecifier)(d)))
   .range([marginLeft, width - marginRight])
-  .padding(0.7);
+  .padding(0.7)
 
 const y = d3
   .scaleLinear()
@@ -45,7 +60,6 @@ const svg = d3.create('svg').attr('width', width).attr('height', height)
 
 const xTicks = d3
   .axisBottom(x)
-  .tickFormat((d: string) => d[0])
   .tickSize(0)
   .tickPadding(16)
   .tickSizeOuter(0)
@@ -54,26 +68,23 @@ svg
   .append('g')
   .attr('class', 'axis')
   .attr('transform', `translate(0,${height - marginBottom})`)
-  .call(xTicks);
+  .call(xTicks)
 
-const yTicks =
-  d3
-    .axisRight(y)
-    .ticks(yMax / 200 + 1)
-    .tickFormat(d => d.toString())
+const yTicks = d3
+  .axisRight(y)
+  .tickFormat(d => d.toString())
 
-const yGridLines =
-  d3
-    .axisRight(y)
-    .ticks(yMax / 200 + 1)
-    .tickSize(-width + marginLeft + marginRight)
-    .tickPadding(10);
+const yGridLines = d3
+  .axisRight(y)
+  .ticks(yMax / props.scalingStep + 1)
+  .tickSize(-width + marginLeft + marginRight)
+  .tickPadding(10)
 
-const yRemoveVerticalLine =
-  g => g.select(".domain").remove()
+const yRemoveVerticalLine = g => g.select('.domain').remove()
 
-const moveTickTextUp =
-  g => { g.selectAll(".tick text").attr("dy", "0") }
+const moveTickTextUp = g => {
+  g.selectAll('.tick text').attr('dy', '0')
+}
 
 svg
   .append('g')
@@ -82,7 +93,7 @@ svg
   .call(yTicks)
   .call(yGridLines)
   .call(yRemoveVerticalLine)
-  .call(moveTickTextUp);
+  .call(moveTickTextUp)
 
 /**
  * Bars
@@ -111,36 +122,41 @@ svg
   .selectAll('rect')
   .data(props.data)
   .join('rect')
-  .attr('x', d => x(d3.timeFormat('%b')(d.date)) || 0)
+  .attr('x', d => x(d3.timeFormat(props.timeFormatSpecifier)(d.date)) || 0)
   .attr('y', d => y(d.value))
   .attr('width', x.bandwidth())
   .attr('height', d => height - marginBottom - y(d.value))
   .attr('fill', 'url(#barGradient)')
   .attr('stroke', 'var(--color-back-delivery-light)')
-  .attr('stroke-width', 1);
+  .attr('stroke-width', 1)
 
 onMounted(() => {
-  if (!svgRef.value) return;
+  if (!svgRef.value) return
   svgRef.value.appendChild(svg.node()!)
 })
 </script>
 
 <template>
   <div class="container">
-    <div class="card">
-      <div class="header-graph">
-        <div>
-          <p class="total">
-            <span class="total-icon"><IconUpwardArrow /></span>
-            <span>{{ productionTotal }} kWh</span>
-          </p>
-          <p class="converter-name">{{ title }}</p>
-        </div>
-        <div class="sun-icon">
-          <IconSun />
-        </div>
+    <div class="columns">
+      <div class="header">
+        <h1 class="page-title">{{ title }}</h1>
       </div>
-      <div ref="svgRef" id="svg-ref" />
+      <div class="card">
+        <div class="header-graph">
+          <div>
+            <p class="total">
+              <span class="total-icon"><IconUpwardArrow /></span>
+              <span>{{ productionTotal }} kWh</span>
+            </p>
+            <p class="converter-name">{{ deviceName }}</p>
+          </div>
+          <div class="sun-icon">
+            <IconSun />
+          </div>
+        </div>
+        <div ref="svgRef" id="svg-ref" />
+      </div>
     </div>
   </div>
 </template>
@@ -150,7 +166,19 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   align-items: center;
-
+  margin-bottom: 1rem;
+}
+.columns {
+  display: flex;
+  flex-direction: column;
+}
+.header {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.page-title {
+  font-size: 1.8rem;
+  font-weight: bold;
 }
 .card {
   border-radius: 1rem;
@@ -167,7 +195,7 @@ onMounted(() => {
   color: var(--color-back-delivery-light);
 }
 .total-icon {
-  margin-right: .125rem;
+  margin-right: 0.125rem;
   stroke: var(--color-back-delivery-light);
 }
 .converter-name {

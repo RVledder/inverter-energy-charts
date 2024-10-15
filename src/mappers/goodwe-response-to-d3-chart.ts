@@ -4,7 +4,7 @@ import {
 } from '@/models/goodwe/statistics-chart-response'
 import type { BackDeliveryChartData } from '@/models/D3/back-delivery-chart-data';
 
-export const mapGoodWeResponseToD3Chart = (jsonData: GetStatisticsChartsResponseType): BackDeliveryChartData | void => {
+export const mapGoodWeChartResponseToD3Chart = (jsonData: GetStatisticsChartsResponseType): BackDeliveryChartData | void => {
   const validation = getStatisticsChartsResponseSchema.safeParse(jsonData);
 
   if (!validation.success) {
@@ -14,17 +14,33 @@ export const mapGoodWeResponseToD3Chart = (jsonData: GetStatisticsChartsResponse
 
   return validation.data.data[0].yield.map(({x, y}) => {
     return {
-      date: parseGoodWeDate(x),
+      date: parseDate(x),
       value: y
     }
   });
 }
 
 /**
- * GoodWe returns a date as 'MM.YYYY'
+ * GoodWe returns a date as 'MM.YYYY' or as 'MM.DD.YYYY'.
+ * Parse this into a correct date.
  */
-const parseGoodWeDate = (dateString: string) => {
-  const [month, year] = dateString.split('.');
-  return new Date(parseInt(year), parseInt(month) - 1);
-}
+const parseDate = (dateString: string) => {
+  // Check if the format is MM.DD.YYYY
+  const ddMmYyyyPattern = /^\d{2}\.\d{2}\.\d{4}$/;
+  if (ddMmYyyyPattern.test(dateString)) {
+    const [month, day, year] = dateString.split('.').map(Number);
+
+    return new Date(year, month - 1, day);
+  }
+
+  // If not DD.MM.YYYY, check for MM.YYYY format
+  const mmYyyyPattern = /^\d{2}\.\d{4}$/;
+  if (mmYyyyPattern.test(dateString)) {
+    const [month, year] = dateString.split('.').map(Number);
+    return new Date(year, month - 1);
+  }
+
+  // Handle invalid format
+  throw new Error('Invalid date format');
+};
 
