@@ -1,0 +1,1 @@
+Get the icons from https://www.svgrepo.com/vectors/arrow/2

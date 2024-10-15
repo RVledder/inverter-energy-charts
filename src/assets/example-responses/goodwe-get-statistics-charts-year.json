@@ -1,0 +1,125 @@
+{
+  "language": "en",
+  "function": null,
+  "hasError": false,
+  "msg": "success",
+  "code": "0",
+  "data": [
+    {
+      "yield": [
+        {
+          "x": "01.2024",
+          "y": 74.8
+        },
+        {
+          "x": "02.2024",
+          "y": 91.7
+        },
+        {
+          "x": "03.2024",
+          "y": 226.7
+        },
+        {
+          "x": "04.2024",
+          "y": 357.4
+        },
+        {
+          "x": "05.2024",
+          "y": 511.4
+        },
+        {
+          "x": "06.2024",
+          "y": 518.1
+        },
+        {
+          "x": "07.2024",
+          "y": 511.1
+        },
+        {
+          "x": "08.2024",
+          "y": 433.7
+        },
+        {
+          "x": "09.2024",
+          "y": 284
+        },
+        {
+          "x": "10.2024",
+          "y": 95.7
+        },
+        {
+          "x": "11.2024",
+          "y": 0
+        },
+        {
+          "x": "12.2024",
+          "y": 0
+        }
+      ],
+      "income": [
+        {
+          "x": "01.2024",
+          "y": 16.46
+        },
+        {
+          "x": "02.2024",
+          "y": 20.17
+        },
+        {
+          "x": "03.2024",
+          "y": 49.87
+        },
+        {
+          "x": "04.2024",
+          "y": 78.63
+        },
+        {
+          "x": "05.2024",
+          "y": 112.51
+        },
+        {
+          "x": "06.2024",
+          "y": 113.98
+        },
+        {
+          "x": "07.2024",
+          "y": 112.44
+        },
+        {
+          "x": "08.2024",
+          "y": 95.41
+        },
+        {
+          "x": "09.2024",
+          "y": 62.48
+        },
+        {
+          "x": "10.2024",
+          "y": 21.05
+        },
+        {
+          "x": "11.2024",
+          "y": 0
+        },
+        {
+          "x": "12.2024",
+          "y": 0
+        }
+      ],
+      "gensetGen": null,
+      "threshold": [],
+      "label": "Thuis",
+      "mockLabel": null,
+      "yieldUnit": "Energieopwekking(kWh)",
+      "currencyUnit": "Opbrengst(EUR)",
+      "gensetGenUnit": null
+    }
+  ],
+  "components": {
+    "para": "{\"model\":{\"Ids\":\"72d2ff29-c432-496d-8643-1c34ffe697ce\",\"Range\":1,\"Type\":4,\"Start\":\"01/01/2024\",\"End\":\"\",\"ImageInfo\":null,\"PageIndex\":0,\"PageSize\":0,\"Sidx\":null,\"Sord\":null}}",
+    "langVer": 250,
+    "timeSpan": 67,
+    "api": "http://eu.semsportal.com:85/api/v1/Statistics/GetStatisticsCharts",
+    "msgSocketAdr": null
+  }
+}
